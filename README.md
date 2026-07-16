@@ -6,12 +6,17 @@ using `client.runtime.evaluate_interaction()` from the
 
 Wire the endpoint into your agent at each boundary where content enters the
 model's context window (user prompt, tool call, tool result, final answer). Each
-call evaluates the interaction so far and returns:
+call re-evaluates the whole interaction and returns:
 
 - **`evaluated_interaction[].analysis.signals`**: what the analyzers detected on
-  each message. Always populated, independent of policy.
+  each message. Always populated, independent of policy. The notebooks print
+  these for every message, so you can watch the interaction build up boundary by
+  boundary.
 - **`outcome.action` / `outcome.detections`**: policy enforcement, populated
   once enterprise Runtime v2 policies are configured on the tenant.
+
+The agent framework is your choice. HiddenLayer works at the payload level, so
+integrate at whichever boundaries your loop exposes.
 
 One notebook per provider payload format:
 
