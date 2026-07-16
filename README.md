@@ -1,11 +1,12 @@
 # Integrating Runtime Security
 
-Notebooks for evaluating **agentic runtime security** with HiddenLayer, using
-`client.runtime.evaluate_interaction()` from the
+Notebooks for **integrating HiddenLayer runtime security into agentic systems**,
+using `client.runtime.evaluate_interaction()` from the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
 
-Call the endpoint at each boundary where content enters the model's context
-window (user prompt, tool call, tool result, final answer) and read back:
+Wire the endpoint into your agent at each boundary where content enters the
+model's context window (user prompt, tool call, tool result, final answer). Each
+call evaluates the interaction so far and returns:
 
 - **`evaluated_interaction[].analysis.signals`**: what the analyzers detected on
   each message. Always populated, independent of policy.
