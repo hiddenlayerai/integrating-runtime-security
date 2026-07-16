@@ -1,28 +1,37 @@
 # Integrating Runtime Security
 
-Notebooks for integrating **HiddenLayer AI Runtime Security (v2 pass-through
-API)** into an agentic system, using the
+Notebooks for integrating **HiddenLayer AI Runtime Security** into an agentic
+system with a single endpoint, `client.runtime.evaluate_interaction()`
+(`POST /detection/v2/interaction-evaluations`), using the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
-Wrap your model calls: `client.runtime.evaluate_request()` scans the payload
-before the LLM, `client.runtime.evaluate_response()` scans the answer after.
-The body is the raw provider payload, returned in the same format, and the
-enforcement action arrives on the `HL-Runtime-Action` response header.
 
-One notebook per supported provider payload format:
+`evaluate_interaction` takes the **whole interaction so far** and returns the
+full evaluation: the canonicalized messages with per-message signals, plus a
+policy `outcome` (action, threat level, detections, and the
+`effective_interaction` to forward). You call it every time the model's context
+window grows, and act on `outcome.action` however your system decides.
+
+Each notebook builds one agent turn up **boundary by boundary** — every point
+where new content enters the context window — for one provider payload format:
 
 | Notebook | Payload format |
 |----------|----------------|
-| [`runtime_v2_openai_chat_completions.ipynb`](./runtime_v2_openai_chat_completions.ipynb) | [OpenAI Chat Completions](https://platform.openai.com/docs/api-reference/chat) |
-| [`runtime_v2_openai_responses.ipynb`](./runtime_v2_openai_responses.ipynb) | [OpenAI Responses](https://platform.openai.com/docs/api-reference/responses) |
-| [`runtime_v2_anthropic_messages.ipynb`](./runtime_v2_anthropic_messages.ipynb) | [Anthropic Messages](https://docs.anthropic.com/en/api/messages) |
+| [`evaluate_interaction_openai_chat_completions.ipynb`](./evaluate_interaction_openai_chat_completions.ipynb) | [OpenAI Chat Completions](https://platform.openai.com/docs/api-reference/chat) |
+| [`evaluate_interaction_openai_responses.ipynb`](./evaluate_interaction_openai_responses.ipynb) | [OpenAI Responses](https://platform.openai.com/docs/api-reference/responses) |
+| [`evaluate_interaction_anthropic_messages.ipynb`](./evaluate_interaction_anthropic_messages.ipynb) | [Anthropic Messages](https://docs.anthropic.com/en/api/messages) |
 
-Each notebook runs the same scenarios (safe request, prompt injection, PII in
-the request, PII in the response, and a linked request/response roundtrip), so
-the only difference between them is the payload shape. The provider format is
-auto-detected from the body. On **detect** or **redact**, the payload
-(potentially modified) comes back in the provider's format; on **block**, a
-canned block message comes back in the provider's *response* format, ready to
-return to the caller as if the model had said it.
+The four boundaries, evaluated in order:
+
+1. **User prompt** enters the context
+2. **Assistant tool call** is emitted
+3. **Tool result** returns (untrusted third-party input — the indirect
+   prompt-injection channel; the notebooks smuggle an injection in here)
+4. **Assistant final answer** goes out
+
+The interaction is passed in each provider's **native payload format**;
+`evaluate_interaction` canonicalizes it internally so detection rules run
+against a uniform structure, and `outcome.effective_interaction` comes back in
+the same format you sent.
 
 ## Quick start
 
@@ -40,12 +49,13 @@ jupyter lab
 
 `.env` is read by each notebook via `python-dotenv`. Never commit it.
 
-> **Requires a tenant with Runtime v2 enabled.** Without the feature flag the
-> calls succeed but return the payload unchanged, with no action header and no
-> analysis. The endpoint is beta; the SDK emits a `BetaWarning`.
+> **Requires a tenant with Runtime v2 enabled and detection policies
+> configured.** Without them the calls succeed and return a well-formed
+> response, but `action` is `NONE` and `detections` is empty. The endpoint is
+> beta; the SDK emits a `BetaWarning`.
 
 ## Resources
 
 - [HiddenLayer Documentation](https://docs.hiddenlayer.ai/)
 - [Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python)
-- [SDK API Reference](https://github.com/hiddenlayerai/hiddenlayer-sdk-python/blob/main/api.md)
+- [SDK API Reference](https://github.com/hiddenlayerai/hiddenlayer-sdk-python/blob/main/api.md#runtime)
