@@ -5,12 +5,15 @@ using `client.runtime.evaluate_interaction()` from the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
 
 Wire the endpoint into your agent at each boundary where content enters the
-model's context window (user prompt, tool call, tool result, final answer). Each
-call re-evaluates the whole interaction and returns:
+model's context window (user prompt, tool call, tool result, final answer). You
+own the conversation history: accumulate the messages client-side and send the
+full interaction on every call. The endpoint is stateless with respect to the
+messages (it evaluates exactly what you send); `external_session_id` only groups
+the evaluations in HiddenLayer for observability. Each call returns:
 
 - **`evaluated_interaction[].analysis.signals`**: what the analyzers detected on
   each message. Always populated, independent of policy. The notebooks print
-  these for every message, so you can watch the interaction build up boundary by
+  these for every message, so you can watch the interaction grow boundary by
   boundary.
 - **`outcome.action` / `outcome.detections`**: policy enforcement, populated
   once enterprise Runtime v2 policies are configured on the tenant.
