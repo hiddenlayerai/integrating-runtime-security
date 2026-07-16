@@ -5,11 +5,13 @@ using `client.runtime.evaluate_interaction()` from the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
 
 Wire the endpoint into your agent at each boundary where content enters the
-model's context window (user prompt, tool call, tool result, final answer). You
-own the conversation history: accumulate the messages client-side and send the
-full interaction on every call. The endpoint is stateless with respect to the
-messages (it evaluates exactly what you send); `external_session_id` only groups
-the evaluations in HiddenLayer for observability. Each call returns:
+model's context window (user prompt, tool call, tool result, final answer).
+HiddenLayer maintains the session server-side, keyed by `external_session_id`:
+it persists each message (with a TTL), carries forward timestamps, tool names,
+and redacted history across calls, and links request and response turns via
+`HL-Roundtrip-Id`. These notebooks send the full interaction on each call under
+one `external_session_id`, so the platform ties the calls into a single session.
+Each call returns:
 
 - **`evaluated_interaction[].analysis.signals`**: what the analyzers detected on
   each message. Always populated, independent of policy. The notebooks print
