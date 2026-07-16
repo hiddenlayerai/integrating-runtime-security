@@ -11,8 +11,8 @@ policy `outcome` (action, threat level, detections, and the
 `effective_interaction` to forward). You call it every time the model's context
 window grows, and act on `outcome.action` however your system decides.
 
-Each notebook builds one agent turn up **boundary by boundary** — every point
-where new content enters the context window — for one provider payload format:
+Each notebook builds one agent turn up **boundary by boundary** (every point
+where new content enters the context window) for one provider payload format:
 
 | Notebook | Payload format |
 |----------|----------------|
@@ -24,7 +24,7 @@ The four boundaries, evaluated in order:
 
 1. **User prompt** enters the context
 2. **Assistant tool call** is emitted
-3. **Tool result** returns (untrusted third-party input — the indirect
+3. **Tool result** returns (untrusted third-party input, the indirect
    prompt-injection channel; the notebooks smuggle an injection in here)
 4. **Assistant final answer** goes out
 
