@@ -5,17 +5,13 @@ using `client.runtime.evaluate_interaction()` from the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
 
 Wire the endpoint into your agent at each boundary where content enters the
-model's context window (user prompt, tool call, tool result, final answer).
-HiddenLayer maintains the session server-side, keyed by `external_session_id`:
-it persists each message (with a TTL), carries forward timestamps, tool names,
-and redacted history across calls, and links request and response turns via
-`HL-Roundtrip-Id`. These notebooks send the full interaction on each call under
-one `external_session_id`, so the platform ties the calls into a single session.
-Every returned message carries **`analysis.signals`**: what the analyzers
-detected (`prompt_injection`, `personally_identifiable_information`, `code`,
-`denial_of_service`, `guardrails`, `url`, `language`). The notebooks print these
-for each message so you can see exactly what fired, then use the signals to
-decide what your agent does.
+model's context window (user prompt, tool call, tool result, final answer). Set
+one `HL-Runtime-Session-Id` across the agent's turns and HiddenLayer strings the
+evaluations into a single session. Every returned message carries
+**`analysis.signals`**: what the analyzers detected (`prompt_injection`,
+`personally_identifiable_information`, `code`, `denial_of_service`, `guardrails`,
+`url`, `language`). The notebooks print these for each message so you can see
+exactly what fired, then use the signals to decide what your agent does.
 
 The agent framework is your choice. HiddenLayer works at the payload level, so
 integrate at whichever boundaries your loop exposes.
