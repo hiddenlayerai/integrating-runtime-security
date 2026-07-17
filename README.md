@@ -11,14 +11,11 @@ it persists each message (with a TTL), carries forward timestamps, tool names,
 and redacted history across calls, and links request and response turns via
 `HL-Roundtrip-Id`. These notebooks send the full interaction on each call under
 one `external_session_id`, so the platform ties the calls into a single session.
-Each call returns:
-
-- **`evaluated_interaction[].analysis.signals`**: what the analyzers detected on
-  each message. Always populated, independent of policy. The notebooks print
-  these for every message, so you can watch the interaction grow boundary by
-  boundary.
-- **`outcome.action` / `outcome.detections`**: policy enforcement, populated
-  once enterprise Runtime v2 policies are configured on the tenant.
+Every returned message carries **`analysis.signals`**: what the analyzers
+detected (`prompt_injection`, `personally_identifiable_information`, `code`,
+`denial_of_service`, `guardrails`, `url`, `language`). The notebooks print these
+for each message so you can see exactly what fired, then use the signals to
+decide what your agent does.
 
 The agent framework is your choice. HiddenLayer works at the payload level, so
 integrate at whichever boundaries your loop exposes.
@@ -28,6 +25,10 @@ untrusted input (a poisoned tool result), the agent withholds the flagged
 content and forwards a short note built from the signals instead, so the model
 knows something was detected and can self-correct without ever seeing the
 malicious content. The agent keeps running.
+
+Beyond using the signals directly, you can craft HiddenLayer policy rules
+against these same signals; when a rule matches, the decision comes back on
+`outcome` so enforcement happens in the platform rather than your agent code.
 
 One notebook per provider payload format:
 
@@ -51,8 +52,7 @@ ENV
 jupyter lab
 ```
 
-> Beta endpoint; the SDK emits a `BetaWarning`. `outcome` stays empty until
-> Runtime v2 policies are configured on the tenant; `signals` do not.
+> Beta endpoint; the SDK emits a `BetaWarning`.
 
 ## Resources
 
