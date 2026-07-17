@@ -1,46 +1,8 @@
 # Integrating Runtime Security
 
-Notebooks for **integrating HiddenLayer runtime security into agentic systems**,
-using `client.runtime.evaluate_interaction()` from the
+Runnable notebooks showing how to integrate HiddenLayer AI Runtime Security into
+an agentic system, one per supported payload format, using the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
-
-Integration is one SDK method, `client.runtime.evaluate_interaction()`, called at
-each boundary where content enters the model's context window (user prompt, tool
-call, tool result, final answer). The arguments are recommended for proper
-functionality:
-
-- `interaction`: the native provider payload you send to or receive from the model
-- `metadata`: `model`, `provider`, `requester_id`, `external_session_id`
-- `hl_project_id`: the project whose policy evaluates the interaction
-- `HL-Runtime-Session-Id` header: the same value across the run, so HiddenLayer
-  strings the turns into one session
-
-Every returned message carries **`analysis.signals`**: what the analyzers
-detected (`prompt_injection`, `personally_identifiable_information`, `code`,
-`denial_of_service`, `guardrails`, `url`, `language`). Use the signals to decide
-what your agent does. The notebooks show the raw SDK call first, then wrap it in
-an optional `scan()` helper; wrapping it is your choice, the SDK call is the same
-either way.
-
-The payloads in the notebooks are hardcoded so they run without any LLM provider
-configured. In your own agent you already build these payloads to call the model;
-to integrate, pass those same payloads to `evaluate_interaction` at the matching
-boundaries.
-
-The agent framework is your choice. HiddenLayer works at the payload level, so
-integrate at whichever boundaries your loop exposes.
-
-Each notebook ends with a self-correction pattern: when a signal fires on
-untrusted input (a poisoned tool result), the agent withholds the flagged
-content and forwards a short note built from the signals instead, so the model
-knows something was detected and can self-correct without ever seeing the
-malicious content. The agent keeps running.
-
-Beyond using the signals directly, you can craft HiddenLayer policy rules
-against these same signals; when a rule matches, the decision comes back on
-`outcome` so enforcement happens in the platform rather than your agent code.
-
-One notebook per provider payload format:
 
 | Notebook | Payload format |
 |----------|----------------|
@@ -62,7 +24,42 @@ ENV
 jupyter lab
 ```
 
+Get credentials from the HiddenLayer console (Settings, API Keys). Each notebook
+runs top to bottom with no LLM provider configured.
+
 > Beta endpoint; the SDK emits a `BetaWarning`.
+
+## How it works
+
+Call `client.runtime.evaluate_interaction()` at each boundary where content
+enters the model's context window (user prompt, tool call, tool result, final
+answer). The arguments, all recommended for proper functionality:
+
+- `interaction`: the native provider payload you send to or receive from the model
+- `metadata`: `model`, `provider`, `requester_id`, `external_session_id`
+- `hl_project_id`: the project whose policy evaluates the interaction
+- `HL-Runtime-Session-Id` header: the same value across the run, so HiddenLayer
+  strings the turns into one session
+
+Each returned message carries **`analysis.signals`** (`prompt_injection`,
+`personally_identifiable_information`, `code`, `denial_of_service`, `guardrails`,
+`url`, `language`). Use the signals to decide what your agent does.
+
+## Integrating into your agent
+
+The notebook payloads are hardcoded so they run without an LLM provider. In your
+agent you already build these payloads to call the model; to integrate, pass
+those same payloads to `evaluate_interaction` at the matching boundaries. The SDK
+call does not change, and the agent framework is your choice.
+
+The notebooks show two ways to act on a detection:
+
+- **Self-correction**: when a signal fires on untrusted input, withhold the
+  flagged content and forward a short note built from the signals, so the model
+  self-corrects without ever seeing it and the agent keeps running.
+- **Policy enforcement**: craft HiddenLayer policy rules against these signals;
+  when a rule matches, the decision comes back on `outcome`, so enforcement
+  happens in the platform rather than your agent code.
 
 ## Resources
 
