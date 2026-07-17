@@ -22,6 +22,11 @@ what your agent does. The notebooks show the raw SDK call first, then wrap it in
 an optional `scan()` helper; wrapping it is your choice, the SDK call is the same
 either way.
 
+The payloads in the notebooks are hardcoded so they run without any LLM provider
+configured. In your own agent you already build these payloads to call the model;
+to integrate, pass those same payloads to `evaluate_interaction` at the matching
+boundaries.
+
 The agent framework is your choice. HiddenLayer works at the payload level, so
 integrate at whichever boundaries your loop exposes.
 
