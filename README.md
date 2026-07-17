@@ -23,6 +23,12 @@ Each call returns:
 The agent framework is your choice. HiddenLayer works at the payload level, so
 integrate at whichever boundaries your loop exposes.
 
+Each notebook ends with a self-correction pattern: when a signal fires on
+untrusted input (a poisoned tool result), the agent withholds the flagged
+content and forwards a short note built from the signals instead, so the model
+knows something was detected and can self-correct without ever seeing the
+malicious content. The agent keeps running.
+
 One notebook per provider payload format:
 
 | Notebook | Payload format |
