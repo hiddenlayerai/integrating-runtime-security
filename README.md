@@ -39,7 +39,7 @@ answer). The arguments, all recommended for proper functionality:
 - `metadata`: `model`, `provider`, `requester_id`, `external_session_id`
 - `hl_project_id`: the project whose policy evaluates the interaction
 - `HL-Runtime-Session-Id` header: the same value across the run, so HiddenLayer
-  strings the turns into one session
+  groups the turns into one session
 
 Each returned message carries **`analysis.signals`** (`prompt_injection`,
 `personally_identifiable_information`, `code`, `denial_of_service`, `guardrails`,
@@ -55,8 +55,8 @@ call does not change, and the agent framework is your choice.
 The notebooks show two ways to act on a detection:
 
 - **Self-correction**: when a signal fires on untrusted input, withhold the
-  flagged content and forward a short note built from the signals, so the model
-  self-corrects without ever seeing it and the agent keeps running.
+  flagged content and forward a short security notice built from the signals, so
+  the model self-corrects without ever seeing it and the agent keeps running.
 - **Policy enforcement**: craft HiddenLayer policy rules against these signals;
   when a rule matches, the decision comes back on `outcome`, so enforcement
   happens in the platform rather than your agent code.
