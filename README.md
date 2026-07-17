@@ -4,14 +4,23 @@ Notebooks for **integrating HiddenLayer runtime security into agentic systems**,
 using `client.runtime.evaluate_interaction()` from the
 [HiddenLayer Python SDK](https://github.com/hiddenlayerai/hiddenlayer-sdk-python).
 
-Wire the endpoint into your agent at each boundary where content enters the
-model's context window (user prompt, tool call, tool result, final answer). Set
-one `HL-Runtime-Session-Id` across the agent's turns and HiddenLayer strings the
-evaluations into a single session. Every returned message carries
-**`analysis.signals`**: what the analyzers detected (`prompt_injection`,
-`personally_identifiable_information`, `code`, `denial_of_service`, `guardrails`,
-`url`, `language`). The notebooks print these for each message so you can see
-exactly what fired, then use the signals to decide what your agent does.
+Integration is one SDK method, `client.runtime.evaluate_interaction()`, called at
+each boundary where content enters the model's context window (user prompt, tool
+call, tool result, final answer). The arguments are recommended for proper
+functionality:
+
+- `interaction`: the native provider payload you send to or receive from the model
+- `metadata`: `model`, `provider`, `requester_id`, `external_session_id`
+- `hl_project_id`: the project whose policy evaluates the interaction
+- `HL-Runtime-Session-Id` header: the same value across the run, so HiddenLayer
+  strings the turns into one session
+
+Every returned message carries **`analysis.signals`**: what the analyzers
+detected (`prompt_injection`, `personally_identifiable_information`, `code`,
+`denial_of_service`, `guardrails`, `url`, `language`). Use the signals to decide
+what your agent does. The notebooks show the raw SDK call first, then wrap it in
+an optional `scan()` helper; wrapping it is your choice, the SDK call is the same
+either way.
 
 The agent framework is your choice. HiddenLayer works at the payload level, so
 integrate at whichever boundaries your loop exposes.
