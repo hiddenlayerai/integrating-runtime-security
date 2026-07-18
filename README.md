@@ -10,6 +10,11 @@ an agentic system, one per supported payload format, using the
 | [`evaluate_interaction_openai_responses.ipynb`](./evaluate_interaction_openai_responses.ipynb) | [OpenAI Responses](https://platform.openai.com/docs/api-reference/responses) |
 | [`evaluate_interaction_anthropic_messages.ipynb`](./evaluate_interaction_anthropic_messages.ipynb) | [Anthropic Messages](https://docs.anthropic.com/en/api/messages) |
 
+For the concept, see
+[`runtime-security-agent-signals-walkthrough.md`](./runtime-security-agent-signals-walkthrough.md):
+a data-flow diagram and walkthrough of the four boundaries, the per-message
+signals, and the self-correction pattern.
+
 ## Quick start
 
 ```bash
